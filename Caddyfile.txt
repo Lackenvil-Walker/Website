@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: sfisapp-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - php_fpm
+    restart: unless-stopped
+
+  php_fpm:
+    image: php:8.2-fpm-alpine
+    container_name: sfisapp-php
+    working_dir: /var/www/html
+    volumes:
+      - ./site:/var/www/html:rw
+    # Uncomment if you later need common PHP extensions (pdo_mysql, gd, etc.)
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.php
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
